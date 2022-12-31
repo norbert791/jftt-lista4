@@ -15,10 +15,11 @@ namespace compilerLogic {
   
   class Assignment : Command {
     public:
-      Assignment(EOperator operation, Variable left, Variable irght) :
-        left{left}, right{right}, operation{operation} {};
-      virtual IntermidiateCode parseInter() override final;
+      Assignment(EOperator operation, Variable target, Variable left, Variable right) :
+        target{target}, left{left}, right{right}, operation{operation} {};
+      virtual std::vector<IntermidiateCode> parseInter() override final;
     private:
+      Variable target;
       Variable left;
       Variable right;
       EOperator operation;

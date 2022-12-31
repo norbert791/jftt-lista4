@@ -47,6 +47,7 @@ extern void yyerror (char const *);
 %token COMMA ",";
 %token LBRACKET "(";
 %token RBRACKET ")";
+%token SEMICOLON ";";
 %token ERROR;
 
 %left "-" "+"
@@ -67,14 +68,14 @@ main: PROGRAM IS VAR declarations MY_BEGIN commands END
  commands: commands command
  | command
 
- command: identifier ":=" expression ;
+ command: identifier ":=" expression ";"
  | IF condition THEN commands ELSE commands ENDIF
  | IF condition THEN commands ENDIF
  | WHILE condition DO commands ENDWHILE
- | REPEAT commands UNTIL condition ;
- | proc_call ;
- | READ identifier ;
- | WRITE value ;
+ | REPEAT commands UNTIL condition ";"
+ | proc_call ";"
+ | READ identifier ";"
+ | WRITE value ";"
 
  proc_call: identifier "(" declarations ")"
  proc_head: identifier "(" declarations ")"

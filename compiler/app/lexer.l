@@ -26,6 +26,6 @@ ENDIF|ENDWHILE|WHILE|DO   {ECHO;}
 REPEAT|UNTIL|READ|WRITE   {ECHO;}
 BEGIN                     {return MY_BEGIN;}
 (:=)|(<=)|(>=)            {ECHO;}
-[+\-*/%(),=\>\<]          {ECHO;}
+[;+\-*/%(),=\>\<]          {ECHO;}
 [ \t\n]                   {}
 %%
