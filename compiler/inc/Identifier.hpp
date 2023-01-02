@@ -8,7 +8,7 @@ namespace compilerLogic {
   class Identifier {
     public:
       virtual std::string getName() = 0;
-      virtual size_t getId() = 0;
+      virtual int64_t getId() = 0;
       virtual ~Identifier() = default;
   };
 }

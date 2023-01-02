@@ -5,9 +5,9 @@
 #include "IntermidiateCode.hpp"
 
 namespace compilerLogic {
-  class Command {
+  class Command : public ParsableToIntermidiate {
     public:
-      virtual std::vector<IntermidiateCode> parseInter() = 0;
+      virtual std::vector<IntermidiateCode> parseIntermidiate() = 0;
       virtual ~Command() = default;
   };
 }

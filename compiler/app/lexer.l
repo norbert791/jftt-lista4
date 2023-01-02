@@ -12,12 +12,17 @@ int yylex();
 %option noyywrap
 
 %%
-[_a-z]+                   {ECHO;}
+[_a-z]+                   {
+                            myToken tok;
+                            tok.str = std::string(yytext);
+                            yylval = tok;
+                            return identifier;
+                          }
 [0-9]+                    {
                             int64_t temp = 0; 
                             int r = sscanf(yytext, "%" SCNd64, &temp);
                             if (r != 1) {return ERROR;}
-                            yylval.n = r;
+                            yylval.val = r;
                             return num;
                           }
 PROCEDURE|IS|VAR          {ECHO;}

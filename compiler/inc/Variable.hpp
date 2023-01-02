@@ -7,11 +7,11 @@
 namespace compilerLogic {
   class Variable : public Identifier {
     public:
-      Variable(size_t id, std::string name) : id{id}, name{name} {};
+      Variable(int64_t id, std::string name) : id{id}, name{name} {};
       inline virtual std::string getName() override final {return name;};
-      inline virtual size_t getId() override final {return id;};
+      inline virtual int64_t getId() override final {return id;};
     private:
-      size_t id;
+      int64_t id;
       std::string name;
       
   };

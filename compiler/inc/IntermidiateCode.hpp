@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdint>
 #include <array>
+#include <type_traits>
 
 namespace compilerLogic {
   enum class EInstruction: size_t {
@@ -15,7 +16,7 @@ namespace compilerLogic {
     ADD,
     SUB,
     SET,
-    INSTR_COUNT // Number of enum items
+    INSTR_COUNT // Number of enum items, must be last one
   };
 
   enum class EParameterType {
@@ -24,15 +25,23 @@ namespace compilerLogic {
     LABEL_ID, // Jump target
   };
 
-  inline std::string instructionString(EInstruction instr) {
+  inline std::string instructionNameString(EInstruction instr) {
     //TODO: Wyłuskaj 7 z enuma
-    static std::array<std::string, 7> strArray = {
+    constexpr size_t strArraySize = static_cast<std::underlying_type_t<
+                        EInstruction>>(EInstruction::INSTR_COUNT);
+    static const std::array<std::string, strArraySize> strArray = {
       "GET",
       "PUT",
       "LOAD",
       "STORE", 
+      "ADD",
+      "SUB",
+      "SET",
+    };
 
-    } 
+    const size_t index = static_cast<std::underlying_type_t<
+                        EInstruction>>(instr);
+    return strArray[index];
   }
 
   struct IntermidiateCode {
@@ -45,6 +54,10 @@ namespace compilerLogic {
                                                       value{value} {};
   };
 
+  class ParsableToIntermidiate {
+    public:
+      virtual std::vector<IntermidiateCode> parseIntermidiate() = 0;
+  };
 
 }
 
