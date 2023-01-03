@@ -1,4 +1,4 @@
-#include<stdexcept>
+#include <stdexcept>
 #include "IntermidiateParser.hpp"
 
 namespace compilerLogic {
@@ -30,6 +30,7 @@ namespace compilerLogic {
       result.emplace_back(newInstr);
     }
 
+    result.emplace_back("HALT");
     return result;
   }
 }

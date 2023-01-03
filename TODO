@@ -1,2 +1,1 @@
-Dodaj interfejs Parsable
-Dodaj konwertowanie z kodu pośredniego na stringi
+Zrefaktoruj przydzielanie id (obecnie trzeba je nadawać ręcznie)

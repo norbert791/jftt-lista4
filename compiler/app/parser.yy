@@ -15,6 +15,7 @@
 #include <Assignment.hpp>
 #include <IntermidiateParser.hpp>
 #include <IntermidiateCode.hpp>
+#include <IOCommand.hpp>
 #include <fstream>
 
 extern int yylex();
@@ -28,24 +29,23 @@ static std::array<std::string, 2> varStack = {"", ""};
 static size_t varStackIndex = 0;
 static int64_t id = 1;
 
+static inline std::shared_ptr<compilerLogic::Variable> getValue(std::string varName) {
+  if (varName[0] == '#') {
+    return globalBlock->getLiteral(varName, id);
+  } else {
+    auto temp = scope.top()->findIdentifier(varName);
+    return std::dynamic_pointer_cast<compilerLogic::Variable>(temp);
+  }
+}
+
 static void expressionBuilderWrapper(std::string symbol, std::string var1, std::string var2) {
   try {
-    std::shared_ptr<compilerLogic::Identifier> left = nullptr, right = nullptr;
-    if (var1[0] == '#') {
-      left = globalBlock->getLiteral(var1, id);
-    } else {
-      left = scope.top()->findIdentifier(varStack.at(0));
-    }
+    std::shared_ptr<compilerLogic::Variable> left = nullptr, right = nullptr;
+    left = getValue(var1);
     if (symbol != "none"){
-        if (var2[0] == '#') {
-        right = globalBlock->getLiteral(var2, id);
-      } else {
-        right = scope.top()->findIdentifier(varStack.at(1));
-      }
+      right = getValue(var2);
     }
-    std::shared_ptr<compilerLogic::Variable> leftConverted = std::dynamic_pointer_cast<compilerLogic::Variable>(left);
-    std::shared_ptr<compilerLogic::Variable> rightConverted = std::dynamic_pointer_cast<compilerLogic::Variable>(right);
-    exprVar = compilerLogic::expressionBuilder(symbol, leftConverted, rightConverted);
+    exprVar = compilerLogic::expressionBuilder(symbol, left, right);
     std::cout<<"Expression built: "<<std::endl;
   } catch(const std::out_of_range& e) {
     std::cerr<<e.what()<<std::endl;
@@ -132,8 +132,26 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>()); glob
  | WHILE condition DO commands ENDWHILE           {}
  | REPEAT commands UNTIL condition ";"            {}
  | proc_call ";"                                  {}
- | READ identifier ";"                            {}
- | WRITE value ";"                                {}
+ | READ identifier ";"                            {
+                                                    try {
+                                                      auto temp = getValue($2.str);
+                                                      scope.top()->addCommand(
+                                                        std::make_shared<compilerLogic::IOCommand>(
+                                                        compilerLogic::EIOType::INPUT, temp));
+                                                    } catch(const std::logic_error& r) {
+                                                      std::cerr<<"Lorem ipsum"<<std::endl;
+                                                    }
+                                                  }
+ | WRITE value ";"                                {
+                                                    try {
+                                                      auto temp = getValue($2.str);
+                                                      scope.top()->addCommand(
+                                                        std::make_shared<compilerLogic::IOCommand>(
+                                                        compilerLogic::EIOType::OUTPUT, temp));
+                                                    } catch(const std::logic_error& r) {
+                                                      std::cerr<<"Lorem ipsum"<<std::endl;
+                                                    }
+                                                  }
 
  proc_call: identifier "(" declarations ")"
  proc_head: identifier "(" declarations ")"

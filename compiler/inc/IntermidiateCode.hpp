@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdint>
 #include <array>
+#include <vector>
 #include <type_traits>
 
 namespace compilerLogic {
@@ -16,7 +17,11 @@ namespace compilerLogic {
     ADD,
     SUB,
     SET,
-    INSTR_COUNT // Number of enum items, must be last one
+    JUMP,
+    JPOS,
+    JZERO,
+    INSTR_COUNT, // Number of enum items, must be the last one
+    LABEL // Label is part of the assembler so it can be after INSTR_COUNT
   };
 
   enum class EParameterType {
@@ -37,6 +42,9 @@ namespace compilerLogic {
       "ADD",
       "SUB",
       "SET",
+      "JUMP",
+      "JPOS",
+      "JZERO"
     };
 
     const size_t index = static_cast<std::underlying_type_t<
@@ -52,6 +60,7 @@ namespace compilerLogic {
       EParameterType parameterType, int64_t value) : instrName{instrName},
                                                       parameterType{parameterType},
                                                       value{value} {};
+    static int64_t availableLabelId;
   };
 
   class ParsableToIntermidiate {
