@@ -8,14 +8,13 @@ set(LOGIC_SOURCES src/Assignment.cpp src/GlobalBlock.cpp src/IntermidiateParser.
 find_package(FLEX REQUIRED)
 find_package(BISON REQUIRED)
 
-BISON_TARGET(MyParser app/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
+BISON_TARGET(MyParser app/parser.yy ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
              DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/parser.h)
-FLEX_TARGET(MyScanner app/lexer.l  ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp)
+FLEX_TARGET(MyScanner app/lexer.ll ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp)
 ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 
 
-#add_library(compilerLogic STATIC ${LOGIC_SOURCES})
-#target_include_directories(compilerLogic inc)
+add_library(compilerLogic STATIC ${LOGIC_SOURCES})
 
 include_directories(inc)
 add_executable(${PROJECT_NAME}

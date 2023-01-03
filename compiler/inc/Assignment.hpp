@@ -2,6 +2,7 @@
 #define ASSIGNMENT_HPP
 
 #include <memory>
+#include <iostream>
 #include "Variable.hpp"
 #include "Command.hpp"
 
@@ -12,6 +13,7 @@ namespace compilerLogic {
     PROD,
     DIV,
     MOD,
+    NONE,
   };
   
   struct Expression {
@@ -20,11 +22,11 @@ namespace compilerLogic {
     std::shared_ptr<Variable> right;
   };
 
-  class Assignment : Command {
+  class Assignment : public Command {
     public:
       inline Assignment(EOperator operation, std::shared_ptr<Variable> target, std::shared_ptr<Variable> left, std::shared_ptr<Variable> right) :
         target{target}, left{left}, right{right}, operation{operation} {};
-      inline Assignment(EOperator operation, std::shared_ptr<Variable> target, int64_t value) : target{target}, value{value} {};
+      inline Assignment(EOperator operation, std::shared_ptr<Variable> target, std::shared_ptr<Variable> left) : target{target}, left{left} {};
       inline Assignment(std::shared_ptr<Variable> target, Expression expr) :
         operation{expr.operation},
         left{expr.left},
@@ -39,12 +41,14 @@ namespace compilerLogic {
       EOperator operation;
   };
 
-  Expression expressionBuilder(std::string op,
+  static inline Expression expressionBuilder(std::string op,
                                std::shared_ptr<Variable> left,
                                std::shared_ptr<Variable> right) {
     Expression result{};
     result.left = left;
     result.right = right;
+
+    std::cout<<"operator: "<<op<<std::endl;
 
     switch (op[0]) {
       case '+':
@@ -61,6 +65,9 @@ namespace compilerLogic {
         break;
       case '*':
         result.operation = EOperator::PROD;
+        break;
+      case 'n':
+        result.operation = EOperator::NONE;
         break;
       default:
         throw std::logic_error("Operator not found");

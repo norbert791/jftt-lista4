@@ -27,7 +27,7 @@ namespace compilerLogic {
                               );
 
         if (it == availableIdentifiers.end()) {
-          throw std::out_of_range("Identifier not found");
+          throw std::out_of_range("Identifier " + identName +  " not found");
         }
         return *it;
       }

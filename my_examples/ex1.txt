@@ -1,0 +1,7 @@
+PROGRAM IS
+VAR n, p
+BEGIN
+  n := 2
+  p := 3
+  p := n + p
+END

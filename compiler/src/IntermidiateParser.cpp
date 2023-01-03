@@ -3,7 +3,7 @@
 
 namespace compilerLogic {
   std::vector<std::string> IntermidiateParser::parseIntermidiateCode(std::vector<IntermidiateCode> code) {
-    std::vector<std::string> result{code.size()};
+    std::vector<std::string> result{};
 
     for (auto instr : code) {
       std::string newInstr = instructionNameString(instr.instrName);
