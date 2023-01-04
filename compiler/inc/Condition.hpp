@@ -19,6 +19,7 @@ namespace compilerLogic {
                      std::shared_ptr<Variable> left,
                      std::shared_ptr<Variable> right
               ) : compType{compType}, left{left}, right{right}{}
+    inline Condition(){};
     EComperator compType;
     std::shared_ptr<Variable> left = nullptr;
     std::shared_ptr<Variable> right = nullptr;

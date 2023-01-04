@@ -34,7 +34,6 @@ namespace compilerLogic {
   }
 
   std::shared_ptr<Variable> GlobalBlock::getLiteral(std::string str, int64_t& id) {
-    std::cout<<"get literal: "<<str<<std::endl;
     auto it = std::find_if(this->literals.begin(), this->literals.end(), [&str](auto x){return x->getName() == str;});
     std::shared_ptr<Variable> result = nullptr;
     if (it == this->literals.end()) {

@@ -48,8 +48,6 @@ namespace compilerLogic {
     result.left = left;
     result.right = right;
 
-    std::cout<<"operator: "<<op<<std::endl;
-
     switch (op[0]) {
       case '+':
         result.operation = EOperator::SUM;

@@ -7,6 +7,7 @@
 #include <stack>
 #include <memory>
 #include <iostream>
+#include <fstream>
 //Proj headers
 #include <GlobalBlock.hpp>
 #include <MainBlock.hpp>
@@ -16,8 +17,12 @@
 #include <IntermidiateParser.hpp>
 #include <IntermidiateCode.hpp>
 #include <IOCommand.hpp>
-#include <fstream>
+#include <IfBlock.hpp>
+#include <Condition.hpp>
 
+#define YYERROR_VERBOSE 1
+
+extern int yylineno;
 extern int yylex();
 extern void yyerror (char const *);
 extern FILE* yyin;
@@ -25,6 +30,7 @@ extern FILE* yyin;
 static compilerLogic::Expression exprVar;
 static std::shared_ptr<compilerLogic::GlobalBlock> globalBlock = nullptr;
 static std::stack<std::shared_ptr<compilerLogic::Block>> scope{};
+static std::stack<compilerLogic::Condition> condStack{};
 static std::array<std::string, 2> varStack = {"", ""};
 static size_t varStackIndex = 0;
 static int64_t id = 1;
@@ -46,13 +52,36 @@ static void expressionBuilderWrapper(std::string symbol, std::string var1, std::
       right = getValue(var2);
     }
     exprVar = compilerLogic::expressionBuilder(symbol, left, right);
-    std::cout<<"Expression built: "<<std::endl;
   } catch(const std::out_of_range& e) {
     std::cerr<<e.what()<<std::endl;
   } catch(const std::logic_error& e) {
     std::cerr<<"Lorem ipsum"<<std::endl;
   }
 }
+
+static void addIf() {
+  auto temp = std::make_shared<compilerLogic::IfBlock>(scope.top()->getAvailableIdentifiers());
+  scope.top()->addBlock(temp);
+  scope.push(temp);
+}
+
+static void addElse() {
+  std::shared_ptr<compilerLogic::IfBlock> casted =
+    std::dynamic_pointer_cast<compilerLogic::IfBlock>(scope.top());
+  casted->addElseSegment();
+}
+
+static void addCondition(compilerLogic::EComperator condType) {
+  auto temp = scope.top();
+  std::shared_ptr<compilerLogic::ConditionalBlock> casted =
+    std::dynamic_pointer_cast<compilerLogic::ConditionalBlock>(scope.top());
+  auto left = getValue(varStack.at(0));
+  auto right = getValue(varStack.at(1));
+  varStackIndex = 0;
+  compilerLogic::Condition cond{condType, left, right};
+  casted->addCondition(cond);
+}
+
 %}
 
 %code requires{
@@ -109,7 +138,7 @@ procedures: procedures PROCEDURE proc_head IS VAR declarations MY_BEGIN commands
 | procedures PROCEDURE proc_head IS MY_BEGIN commands END
 |
 
-main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>()); globalBlock->addBlock(scope.top());} VAR declarations MY_BEGIN commands END
+main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>(globalBlock->getAvailableIdentifiers())); globalBlock->addBlock(scope.top());} VAR declarations MY_BEGIN commands END
 | PROGRAM IS MY_BEGIN commands END {scope.pop();}
 
  commands: commands command
@@ -127,8 +156,7 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>()); glob
                                                       std::cerr<<"Lorem ipsum"<<std::endl;
                                                     }
                                                   }
- | IF condition THEN commands ELSE commands ENDIF {}
- | IF condition THEN commands ENDIF               {}
+ | IF {addIf();} if_scope {}
  | WHILE condition DO commands ENDWHILE           {}
  | REPEAT commands UNTIL condition ";"            {}
  | proc_call ";"                                  {}
@@ -144,7 +172,8 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>()); glob
                                                   }
  | WRITE value ";"                                {
                                                     try {
-                                                      auto temp = getValue($2.str);
+                                                      auto temp = getValue(varStack.at(0));
+                                                      varStackIndex = 0;
                                                       scope.top()->addCommand(
                                                         std::make_shared<compilerLogic::IOCommand>(
                                                         compilerLogic::EIOType::OUTPUT, temp));
@@ -152,7 +181,8 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>()); glob
                                                       std::cerr<<"Lorem ipsum"<<std::endl;
                                                     }
                                                   }
-
+ if_scope: condition THEN commands ELSE {addElse();} commands ENDIF {scope.pop();}
+ | condition THEN commands ENDIF                                    {scope.pop();}
  proc_call: identifier "(" declarations ")"
  proc_head: identifier "(" declarations ")"
 
@@ -160,7 +190,6 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>()); glob
                                             if (scope.top()->verifyIdentifier($3.str)) {
                                               std::cerr<<("Variable redeclaration: " + $3.str)<<std::endl;
                                             } else {
-                                              std::cout<<("Identifier pushed: " + $3.str)<<std::endl; 
                                               auto newVar = std::make_shared<compilerLogic::Variable>(id++, $3.str);
                                               scope.top()->addAvailableIdentifier(newVar);
                                             }
@@ -169,7 +198,6 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>()); glob
                 if (scope.top()->verifyIdentifier($1.str)) {
                   std::cerr<<("Variable redeclaration: " + $1.str)<<std::endl;
                 } else {
-                  std::cout<<("Identifier pushed: " + $1.str)<<std::endl;
                   auto newVar = std::make_shared<compilerLogic::Variable>(id++, $1.str);
                   scope.top()->addAvailableIdentifier(newVar);
                 }
@@ -200,19 +228,20 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>()); glob
                     varStackIndex = 0;
                    }
 
- condition: value "=" value {}
- | value "!=" value         {}
- | value ">" value          {}
- | value "<" value          {}
- | value ">=" value         {}
- | value "<=" value         {}
+ condition: value "=" value {addCondition(compilerLogic::EComperator::EQUAL);}
+ | value "!=" value         {addCondition(compilerLogic::EComperator::DIFFERENT);}
+ | value ">" value          {addCondition(compilerLogic::EComperator::GREATER);}
+ | value "<" value          {addCondition(compilerLogic::EComperator::LESSER);}
+ | value ">=" value         {addCondition(compilerLogic::EComperator::GEQ);}
+ | value "<=" value         {addCondition(compilerLogic::EComperator::LEQ);}
 
- value: num   {varStack.at(varStackIndex++) = "#" + std::to_string($1.val); std::cout<<"Literal: "<<$1.val<<std::endl;}
+ value: num   {varStack.at(varStackIndex++) = "#" + std::to_string($1.val);}
  | identifier {varStack.at(varStackIndex++) = $1.str;}
 %%
 
 void yyerror(const char msg[]) {
-  fprintf(stderr, "%s\n", msg);
+  fprintf(stderr,"error: %s in line %d\n", msg, yylineno);
+  std::exit(EXIT_FAILURE);
 }
 
 int main(int argc, char* argv[]) {
@@ -230,6 +259,7 @@ int main(int argc, char* argv[]) {
                              globalBlock->parseIntermidiate();
   std::cout<<("Inter length: " + std::to_string(result.size()))<<std::endl;
   compilerLogic::IntermidiateParser interParser{};
+  interParser.showIntermidiateCode(result);
   auto parsed = interParser.parseIntermidiateCode(result);
   std::ofstream outputFile{argv[2]};
   if (!outputFile.good()) {

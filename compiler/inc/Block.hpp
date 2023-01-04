@@ -46,8 +46,9 @@ namespace compilerLogic {
 
       virtual void addCommand(std::shared_ptr<Command> command) = 0;
       virtual void addBlock(std::shared_ptr<Block> block) = 0;
+      virtual std::vector<std::shared_ptr<Identifier>> getAvailableIdentifiers();
       virtual ~Block() = default;
-    private:
+    protected:
       std::vector<std::shared_ptr<Identifier>> availableIdentifiers{};
   };
 }

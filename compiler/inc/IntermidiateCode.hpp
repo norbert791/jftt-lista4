@@ -31,7 +31,6 @@ namespace compilerLogic {
   };
 
   inline std::string instructionNameString(EInstruction instr) {
-    //TODO: Wyłuskaj 7 z enuma
     constexpr size_t strArraySize = static_cast<std::underlying_type_t<
                         EInstruction>>(EInstruction::INSTR_COUNT);
     static const std::array<std::string, strArraySize> strArray = {

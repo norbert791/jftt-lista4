@@ -10,7 +10,7 @@
 int yylex();
 %}
 
-%option noyywrap
+%option noyywrap yylineno
 
 %%
 [_a-z]+                   {
@@ -56,7 +56,7 @@ BEGIN                     {return MY_BEGIN;}
 =                         {return EQ;}
 !=                        {return NEQ;}
 >=                        {return GEQ;}
-[<=]                      {return LEQ;}
+[<]=                      {return LEQ;}
 >                         {return GE;}
 [<]                       {return LE;}
 [ \t\n]                   {}

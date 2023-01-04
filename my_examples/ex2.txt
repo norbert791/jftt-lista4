@@ -1,0 +1,9 @@
+PROGRAM IS
+VAR n, p
+BEGIN
+  READ n;
+  p := 3;
+  p := n + p;
+  IF p > n THEN WRITE n; ENDIF
+  WRITE p;
+END
