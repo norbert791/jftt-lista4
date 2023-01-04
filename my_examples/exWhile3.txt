@@ -1,0 +1,13 @@
+PROGRAM IS
+VAR n
+BEGIN
+  READ n;
+  WHILE n > 0
+  DO
+    IF n < 5 THEN
+      WRITE n;
+    ENDIF
+    WRITE n;
+    n := n - 1;
+  ENDWHILE
+END

@@ -3,7 +3,11 @@ cmake_minimum_required(VERSION 3.17.1)
 set(CXX_STANDARD 17)
 set(CXX_STANDARD TRUE)
 
-set(LOGIC_SOURCES src/Assignment.cpp src/GlobalBlock.cpp src/IntermidiateParser.cpp src/MainBlock.cpp src/IOCommand.cpp src/Block.cpp src/IfBlock.cpp src/IntermidiateCode.cpp)
+set(
+    LOGIC_SOURCES src/Assignment.cpp src/GlobalBlock.cpp src/IntermidiateParser.cpp
+    src/MainBlock.cpp src/IOCommand.cpp src/Block.cpp src/IfBlock.cpp src/IntermidiateCode.cpp
+    src/WhileBlock.cpp
+  )
 
 find_package(FLEX REQUIRED)
 find_package(BISON REQUIRED)

@@ -1,20 +1,20 @@
 #include <iostream>
-#include <IfBlock.hpp>
+#include <WhileBlock.hpp>
 
 namespace compilerLogic {
-  void IfBlock::addCommand(std::shared_ptr<Command> command) {
-    this->currentSegment->push_back(command);
+  void WhileBlock::addCommand(std::shared_ptr<Command> command) {
+    this->commands.push_back(command);
   }
 
-  void IfBlock::addBlock(std::shared_ptr<Block> block) {
-    this->currentSegment->push_back(block);
+  void WhileBlock::addBlock(std::shared_ptr<Block> block) {
+    this->commands.push_back(block);
   }
 
-  void IfBlock::addCondition(Condition cond) {
+  void WhileBlock::addCondition(Condition cond) {
     this->cond = cond;
   }
 
-  std::vector<IntermidiateCode> IfBlock::parseIntermidiate() {
+  std::vector<IntermidiateCode> WhileBlock::parseIntermidiate() {
     std::vector<IntermidiateCode> result{};
     IntermidiateCode trueJumpLabel {
                                       EInstruction::LABEL,
@@ -26,7 +26,9 @@ namespace compilerLogic {
                                       EParameterType::LABEL_ID,
                                       IntermidiateCode::availableLabelId++
                                     };
-
+    if (this->type == EWhileType::UNTIL) {
+      this->cond.compType = negateCondition(this->cond.compType);
+    }
     switch (this->cond.compType)
     { //IF L >= R
       case EComperator::GEQ:
@@ -89,37 +91,51 @@ namespace compilerLogic {
 
     }
 
+    IntermidiateCode entryLabel {
+                                  EInstruction::LABEL,
+                                  EParameterType::LABEL_ID,
+                                  IntermidiateCode::availableLabelId++
+                                };
+
+    result.insert(result.begin(), entryLabel);
+    if (this->type == EWhileType::UNTIL) {
+      std::cout<<"dupa\n";
+      result.insert(result.begin(), {{EInstruction::JUMP, EParameterType::LABEL_ID, trueJumpLabel.value}});
+    }
     //Generate if true code
     std::vector<IntermidiateCode> trueCode{};
     trueCode.push_back(trueJumpLabel);
 
-    for (auto parsable : this->ifTrue) {
+    for (auto parsable : this->commands) {
       auto temp = parsable->parseIntermidiate();
       trueCode.insert(trueCode.end(), temp.begin(), temp.end());
     }
 
     result.insert(result.end(), trueCode.begin(), trueCode.end());
+    result.push_back({EInstruction::JUMP, EParameterType::LABEL_ID, entryLabel.value});
+    result.push_back(falseJumpLabel);
+    
+    
+    
+    
+    
+    
+    /* else { //this->type == EWhileType::UNTIL
+      std::vector<IntermidiateCode> prepended = {{EInstruction::JUMP, EParameterType::LABEL_ID, falseJumpLabel.value}, entryLabel};
+      result.insert(result.begin(), prepended.begin(), prepended.end());
+      //Generate if true code
+      std::vector<IntermidiateCode> trueCode{};
+      trueCode.push_back(falseJumpLabel);
 
-    bool elsePresent = (this->currentSegment) == &(this->ifFalse);
-    if (elsePresent) {
-      std::vector<IntermidiateCode> falseCode{};
-      falseCode.push_back(falseJumpLabel);
-      for (auto parsable : this->ifFalse) {
+      for (auto parsable : this->commands) {
         auto temp = parsable->parseIntermidiate();
-        falseCode.insert(falseCode.end(), temp.begin(), temp.end());
+        trueCode.insert(trueCode.end(), temp.begin(), temp.end());
       }
-      //Add escape jump for if true block
-      IntermidiateCode escapeJumpLabel {
-                                    EInstruction::LABEL,
-                                    EParameterType::LABEL_ID,
-                                    IntermidiateCode::availableLabelId++
-                                  };
-      result.push_back({EInstruction::JUMP, EParameterType::LABEL_ID, escapeJumpLabel.value});
-      falseCode.push_back(escapeJumpLabel);
-      result.insert(result.end(), falseCode.begin(), falseCode.end());
-    } else {
-      result.push_back(falseJumpLabel);
-    }
+
+      result.insert(result.end(), trueCode.begin(), trueCode.end());
+      result.push_back({EInstruction::JUMP, EParameterType::LABEL_ID, entryLabel.value});
+      result.push_back(trueJumpLabel);
+    }*/
 
     return result;
   }

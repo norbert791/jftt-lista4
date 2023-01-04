@@ -19,6 +19,7 @@
 #include <IOCommand.hpp>
 #include <IfBlock.hpp>
 #include <Condition.hpp>
+#include <WhileBlock.hpp>
 
 #define YYERROR_VERBOSE 1
 
@@ -80,6 +81,12 @@ static void addCondition(compilerLogic::EComperator condType) {
   varStackIndex = 0;
   compilerLogic::Condition cond{condType, left, right};
   casted->addCondition(cond);
+}
+
+static void addWhile(compilerLogic::EWhileType type) {
+  auto loop = std::make_shared<compilerLogic::WhileBlock>(scope.top()->getAvailableIdentifiers(), type);
+  scope.top()->addBlock(loop);
+  scope.push(loop);
 }
 
 %}
@@ -157,8 +164,8 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>(globalBl
                                                     }
                                                   }
  | IF {addIf();} if_scope {}
- | WHILE condition DO commands ENDWHILE           {}
- | REPEAT commands UNTIL condition ";"            {}
+ | WHILE {addWhile(compilerLogic::EWhileType::NORMAL);} condition DO commands ENDWHILE        {scope.pop();}
+ | REPEAT {addWhile(compilerLogic::EWhileType::UNTIL);} commands UNTIL condition ";"          {scope.pop();}
  | proc_call ";"                                  {}
  | READ identifier ";"                            {
                                                     try {

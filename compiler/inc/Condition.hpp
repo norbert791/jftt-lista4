@@ -14,6 +14,19 @@ namespace compilerLogic {
     DIFFERENT,
   };
 
+  static inline EComperator negateCondition(EComperator cond) {
+    switch(cond) {
+      case EComperator::EQUAL: return EComperator::DIFFERENT;
+      case EComperator::DIFFERENT: return EComperator::EQUAL;
+      case EComperator::GREATER: return EComperator::LEQ;
+      case EComperator::LESSER: return EComperator::GEQ;
+      case EComperator::LEQ: return EComperator::GREATER;
+      case EComperator::GEQ: return EComperator::LESSER;
+      default:
+        return EComperator::DIFFERENT;
+    }
+  }
+
   struct Condition {
     inline Condition(EComperator compType,
                      std::shared_ptr<Variable> left,

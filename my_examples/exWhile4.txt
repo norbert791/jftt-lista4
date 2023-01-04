@@ -1,0 +1,18 @@
+PROGRAM IS
+VAR n,p
+BEGIN
+  READ n;
+  WHILE n > 0
+  DO
+    IF n < 5 THEN
+      p := n;
+      WHILE p > 0
+      DO
+        WRITE p;
+        p := p - 1;
+      ENDWHILE
+    ENDIF
+    WRITE n;
+    n := n - 1;
+  ENDWHILE
+END

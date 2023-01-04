@@ -1,1 +1,2 @@
-Zrefaktoruj przydzielanie id (obecnie trzeba je nadawać ręcznie)
+Zrefaktoruj przydzielanie id dla zmiennych i etykiet (obecnie trzeba je nadawać ręcznie)
+Dodaj wykrywanie niezainicjalizowanych zmiennych
