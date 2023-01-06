@@ -1,2 +1,9 @@
-Zrefaktoruj przydzielanie id dla zmiennych i etykiet (obecnie trzeba je nadawać ręcznie)
-Dodaj wykrywanie niezainicjalizowanych zmiennych
+-----Refactor------
+>Zrefaktoruj przydzielanie id dla zmiennych i etykiet (obecnie trzeba je nadawać ręcznie)
+>Refactor: kod pośredni powinien używać pointerów do identifierów zamiast
+ich id.
+----Funkcjonalność---------
+>Dodaj wykrywanie niezainicjalizowanych zmiennych
+>Przetestuj poprawność parsowania maina bez deklaracji zmiennych
+>Dodaj IO na parametrach procedur
+>Przetestuj czy poprawnie działa operacja A := B, gdzie A i B to referencja

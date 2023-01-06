@@ -20,6 +20,7 @@ namespace compilerLogic {
       body.insert(body.end(), temp.begin(), temp.end());
     }
 
+    body.push_back({EInstruction::HALT, EParameterType::VALUE, -1});
     return body;
   }
 }

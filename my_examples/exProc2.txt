@@ -1,0 +1,27 @@
+PROCEDURE slabnia(n) IS
+VAR acc
+BEGIN
+  acc := 0;
+  WHILE n > 0
+  DO
+    acc := acc + n;
+    n := n - 1;
+  ENDWHILE
+  n := acc;
+END
+
+PROCEDURE foo(a, b) IS
+BEGIN
+  slabnia(a);
+  slabnia(b);
+END
+
+PROGRAM IS
+VAR n,p
+BEGIN
+  READ n;
+  READ p;
+  foo(n,p);
+  WRITE n;
+  WRITE p;
+END

@@ -17,20 +17,34 @@ namespace compilerLogic {
         }
       }
     }
+    //Map variables to memory adresses
+    {
+      for (auto instr : code) {
+        if (
+            instr.parameterType == EParameterType::VAR_ID && 
+            this->addressMap.find(instr.value) == addressMap.end()
+           ){
+            addressMap.insert(std::make_pair(instr.value, this->mem_pool++));
+        }
+      }
+    }
+
 
     for (auto instr : code) {
       std::string newInstr = instructionNameString(instr.instrName);
       int64_t param = -1;
       switch (instr.parameterType) {
+        case EParameterType::REF_ID:
+          //Only SET requires additional handling
+          if (instr.instrName == EInstruction::SET) {
+            const auto element = this->addressMap.find(instr.value);
+            param = element->second;
+            break;
+          }
+          [[fallthrough]];
         case EParameterType::VAR_ID: {
             const auto element = this->addressMap.find(instr.value);
-            if (element == addressMap.end()) {
-              addressMap.insert(std::make_pair(instr.value, this->mem_pool));
-              param = mem_pool;
-              this->mem_pool++;
-            } else {
-              param = element->second;
-            }
+            param = element->second;
             break;
         }
         case EParameterType::LABEL_ID:
@@ -46,11 +60,15 @@ namespace compilerLogic {
         default:
           throw std::logic_error("Param type not implemented");
       }
-      newInstr += " " + std::to_string(param);
+      newInstr += instr.instrName == EInstruction::HALT ? "" : " " + std::to_string(param);
       result.push_back(newInstr);
     }
 
-    result.push_back("HALT");
+    std::cout<<"Memory map:\n";
+    for (auto p : this->addressMap) {
+      std::cout<<p.first<<" -> "<<p.second<<"\n";
+    }
+
     return result;
   }
 

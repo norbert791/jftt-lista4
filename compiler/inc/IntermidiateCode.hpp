@@ -7,6 +7,24 @@
 #include <vector>
 #include <type_traits>
 
+/**
+ * Regarding intermidiate language semantics:
+ * 
+ * LOAD, STORE + VAR_ID => load, store to variable of given id
+ * LOAD, STORE + REF_ID => convert to LOADI, STOREI + REF_ID
+ * LOADI, STOREI + REF_ID/VAL_ID => LOADI, STOREI to var of given id
+ * ADD, SUB + VAR_ID => add, sub with var of given id
+ * ADD, SUB + REF_ID => convert to ADDI, SUBI + REF_ID
+ * LOADI, STOREI + REF_ID/VAL_ID => LOADI, STOREI to var of given id
+ * JUMPI + REF_ID/VAR_ID => JUMPI using var of given id
+ * JUMP + LABEL_ID => Jump to lavel of given id
+ * SET + VALUE => SET using passed value 
+ * SET + REF_ID => SET using ADDRESS of given variable
+ * 
+ * Any other combinations of EInstruction and EParameterType
+ * are undefined behaviour.
+*/
+
 namespace compilerLogic {
   enum class EInstruction: size_t {
     //Do NOT assign values explicitely
@@ -20,13 +38,26 @@ namespace compilerLogic {
     JUMP,
     JPOS,
     JZERO,
+    JUMPI,
+    ADDI,
+    SUBI,
+    LOADI,
+    STOREI,
+    HALT,
     INSTR_COUNT, // Number of enum items, must be the last one
-    LABEL // Label is part of the assembler so it can be after INSTR_COUNT
+    LABEL // Label is not part of the assembler so it can be after INSTR_COUNT
   };
 
+  /**
+   * Instruction not ending with 'I' (e.g ADD) should not have type REF_ID.
+   * If they do, then it is hint to parser that respective instruction with 'I'
+   * should be substitutet (e.g ADD -> ADDI). This implicit convertion is meant
+   * to simplify arithmetic operations code.
+  */
   enum class EParameterType {
     VALUE,  // Value
-    VAR_ID, // Maps to memory location
+    VAR_ID, // Maps to memory location. It stores arithmetic value.
+    REF_ID, // Maps to memory location. It stores address value.
     LABEL_ID, // Jump target
   };
 
@@ -43,7 +74,13 @@ namespace compilerLogic {
       "SET",
       "JUMP",
       "JPOS",
-      "JZERO"
+      "JZERO",
+      "JUMPI",
+      "ADDI",
+      "SUBI",
+      "LOADI",
+      "STOREI",
+      "HALT"
     };
 
     const size_t index = static_cast<std::underlying_type_t<

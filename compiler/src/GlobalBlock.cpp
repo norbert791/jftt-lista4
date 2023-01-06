@@ -16,6 +16,7 @@ namespace compilerLogic {
 
   std::vector<IntermidiateCode> GlobalBlock::parseIntermidiate() {
     std::vector<IntermidiateCode> result{};
+    //Initialize literals
     for (auto it : literals) {
       std::stringstream stream;
       stream << it->getName().substr(1);
@@ -24,7 +25,10 @@ namespace compilerLogic {
       result.push_back({EInstruction::SET, EParameterType::VALUE, temp});
       result.push_back({EInstruction::STORE, EParameterType::VAR_ID, it->getId()});
     }
-
+    //Add main
+    auto mainCode = this->mainBlock->parseIntermidiate();
+    result.insert(result.end(), mainCode.begin(), mainCode.end());
+    //Add other blocks
     for (auto subBlock : this->blocks) {
       auto temp = subBlock->parseIntermidiate();
       result.insert(result.end(), temp.begin(), temp.end());

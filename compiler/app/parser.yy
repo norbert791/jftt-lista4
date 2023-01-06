@@ -20,6 +20,7 @@
 #include <IfBlock.hpp>
 #include <Condition.hpp>
 #include <WhileBlock.hpp>
+#include <Procedure.hpp>
 
 #define YYERROR_VERBOSE 1
 
@@ -31,8 +32,8 @@ extern FILE* yyin;
 static compilerLogic::Expression exprVar;
 static std::shared_ptr<compilerLogic::GlobalBlock> globalBlock = nullptr;
 static std::stack<std::shared_ptr<compilerLogic::Block>> scope{};
-static std::stack<compilerLogic::Condition> condStack{};
 static std::array<std::string, 2> varStack = {"", ""};
+static std::vector<std::shared_ptr<compilerLogic::Variable>> procedureArgs{};
 static size_t varStackIndex = 0;
 static int64_t id = 1;
 
@@ -55,8 +56,10 @@ static void expressionBuilderWrapper(std::string symbol, std::string var1, std::
     exprVar = compilerLogic::expressionBuilder(symbol, left, right);
   } catch(const std::out_of_range& e) {
     std::cerr<<e.what()<<std::endl;
+    exit(EXIT_FAILURE);
   } catch(const std::logic_error& e) {
-    std::cerr<<"Lorem ipsum"<<std::endl;
+    std::cerr<<"Symbol " + symbol + " is not a variable (line: " + std::to_string(yylineno) + " )"<<std::endl;
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -87,6 +90,67 @@ static void addWhile(compilerLogic::EWhileType type) {
   auto loop = std::make_shared<compilerLogic::WhileBlock>(scope.top()->getAvailableIdentifiers(), type);
   scope.top()->addBlock(loop);
   scope.push(loop);
+}
+
+static void addCallArg(std::string varName) {
+  auto variable = scope.top()->findIdentifier(varName);
+  auto castedVar = std::dynamic_pointer_cast<compilerLogic::Variable>(variable);
+  procedureArgs.push_back(castedVar);
+}
+
+static void addCall(std::string funName) {
+  try {
+    auto fun = globalBlock->findIdentifier(funName);
+    auto castedFun = std::dynamic_pointer_cast<compilerLogic::Procedure>(fun);
+    auto callCommand = castedFun->getCall(procedureArgs);
+    scope.top()->addCommand(callCommand);
+    procedureArgs.clear();
+  } catch (std::logic_error& e) {
+    std::cerr<<"Call error\n";
+    std::cerr<<e.what()<<std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+static inline void addProcedure() {
+  scope.push(std::make_shared<compilerLogic::Procedure>(
+    globalBlock->getAvailableIdentifiers(), id));
+  globalBlock->addBlock(scope.top());
+}
+
+static inline void addParameter(std::string parameterName) {
+  try {
+    auto fun = scope.top();
+    auto castedFun = std::dynamic_pointer_cast<compilerLogic::Procedure>(fun);
+    auto paramRef = std::make_shared<compilerLogic::Variable>(
+      id++,
+      parameterName,
+      compilerLogic::EVariableType::REFERENCE
+    );
+    castedFun->addParameter(paramRef);
+  } catch(std::logic_error& e) {
+    std::cerr<<e.what()<<std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+static inline void addMain() {
+  auto temp = std::make_shared<compilerLogic::MainBlock>(
+    globalBlock->getAvailableIdentifiers());
+  scope.push(temp);
+  globalBlock->addMain(temp);
+}
+
+static inline void setProcName(std::string name) {
+  auto fun = scope.top();
+    auto castedFun = std::dynamic_pointer_cast<compilerLogic::Procedure>(fun);
+  castedFun->setName(name);
+  if (globalBlock->verifyIdentifier(name)) {
+    std::cerr<<("Function redeclaration: " + name)<<std::endl;
+    exit(EXIT_FAILURE);
+  } else {
+    globalBlock->addAvailableIdentifier(castedFun);
+  }
 }
 
 %}
@@ -141,12 +205,14 @@ static void addWhile(compilerLogic::EWhileType type) {
 %%
 program_all: procedures main
 
-procedures: procedures PROCEDURE proc_head IS VAR declarations MY_BEGIN commands END
-| procedures PROCEDURE proc_head IS MY_BEGIN commands END
-|
+procedures: procedures PROCEDURE {addProcedure();} proc_def {}
+| {}
 
-main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>(globalBlock->getAvailableIdentifiers())); globalBlock->addBlock(scope.top());} VAR declarations MY_BEGIN commands END
-| PROGRAM IS MY_BEGIN commands END {scope.pop();}
+proc_def: proc_head IS VAR funParams MY_BEGIN commands END {scope.pop();}
+| proc_head IS MY_BEGIN commands END {scope.pop();}
+
+main: PROGRAM IS {addMain();} VAR declarations MY_BEGIN commands END
+| PROGRAM IS {addMain();} MY_BEGIN commands END {scope.pop();}
 
  commands: commands command
  | command
@@ -160,7 +226,8 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>(globalBl
                                                       
                                                       scope.top()->addCommand(std::make_shared<compilerLogic::Assignment>(temp2Converted, exprVar));
                                                     } catch (const std::logic_error& e) {
-                                                      std::cerr<<"Lorem ipsum"<<std::endl;
+                                                      std::cerr<<"Symbol " + $1.str + " is not a variable (line: " + std::to_string(yylineno) + " )\n";
+                                                      exit(EXIT_FAILURE);
                                                     }
                                                   }
  | IF {addIf();} if_scope {}
@@ -174,7 +241,8 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>(globalBl
                                                         std::make_shared<compilerLogic::IOCommand>(
                                                         compilerLogic::EIOType::INPUT, temp));
                                                     } catch(const std::logic_error& r) {
-                                                      std::cerr<<"Lorem ipsum"<<std::endl;
+                                                      std::cerr<<"Symbol " + $2.str + " is not a variable (line: " + std::to_string(yylineno) + " )\n";
+                                                      exit(EXIT_FAILURE);
                                                     }
                                                   }
  | WRITE value ";"                                {
@@ -185,13 +253,20 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>(globalBl
                                                         std::make_shared<compilerLogic::IOCommand>(
                                                         compilerLogic::EIOType::OUTPUT, temp));
                                                     } catch(const std::logic_error& r) {
-                                                      std::cerr<<"Lorem ipsum"<<std::endl;
+                                                      std::cerr<<"Symbol " + varStack.at(0) + " is not a variable (line: " + std::to_string(yylineno) + " )"<<std::endl;
+                                                      exit(EXIT_FAILURE);
                                                     }
                                                   }
  if_scope: condition THEN commands ELSE {addElse();} commands ENDIF {scope.pop();}
  | condition THEN commands ENDIF                                    {scope.pop();}
- proc_call: identifier "(" declarations ")"
- proc_head: identifier "(" declarations ")"
+ proc_call: identifier "(" funArguments ")" {addCall($1.str);}
+ proc_head: identifier "(" funParams ")" {setProcName($1.str);}
+
+funParams: funParams "," identifier {addParameter($3.str);}
+| identifier {addParameter($1.str);}
+
+ funArguments: funArguments "," identifier {addCallArg($3.str);}
+ | identifier                              {addCallArg($1.str);}
 
  declarations: declarations "," identifier {
                                             if (scope.top()->verifyIdentifier($3.str)) {
@@ -247,7 +322,7 @@ main: PROGRAM IS {scope.push(std::make_shared<compilerLogic::MainBlock>(globalBl
 %%
 
 void yyerror(const char msg[]) {
-  fprintf(stderr,"error: %s in line %d\n", msg, yylineno);
+  fprintf(stderr,"error: %s in line %d\n", msg, yylineno - 1);
   std::exit(EXIT_FAILURE);
 }
 
