@@ -5,7 +5,9 @@
 #include <cstdint>
 #include <array>
 #include <vector>
+#include <memory>
 #include <type_traits>
+#include <Variable.hpp>
 
 /**
  * Regarding intermidiate language semantics:
@@ -99,7 +101,7 @@ namespace compilerLogic {
     static int64_t availableLabelId;
   };
 
-  IntermidiateCode pickRefVar(EParameterType type, std::shared_ptr<Variable> var);
+  IntermidiateCode pickRefVar(EInstruction type, std::shared_ptr<Variable> var);
 
   class ParsableToIntermidiate {
     public:

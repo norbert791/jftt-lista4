@@ -2,6 +2,14 @@ PROGRAM IS
 VAR n
 BEGIN
   READ n;
-  IF n > 5 THEN WRITE 1; ENDIF
-  WRITE 0;
+  IF n != 1 THEN
+    READ n;
+    IF n > 5 THEN
+      WRITE 100;
+    ELSE
+      WRITE 200;
+    ENDIF
+  ELSE
+    WRITE 80;
+  ENDIF
 END

@@ -5,6 +5,6 @@ ich id.
 ----Funkcjonalność---------
 >Dodaj wykrywanie niezainicjalizowanych zmiennych
 >Przetestuj poprawność parsowania maina bez deklaracji zmiennych
->Dodaj IO na parametrach procedur
->Przetestuj czy poprawnie działa operacja A := B, gdzie A i B to referencja [done]
+>Dodaj IO na parametrach procedur!
+>Przetestuj czy poprawnie działa operacja A := B, gdzie A i B to referencja [done a.s]
 >Dodaj więcej testów dla repeat until

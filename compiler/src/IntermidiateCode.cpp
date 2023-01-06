@@ -1,5 +1,6 @@
 #include <memory>
 #include <Variable.hpp>
+#include <stdexcept>
 #include <IntermidiateCode.hpp>
 
 namespace compilerLogic {
@@ -18,8 +19,9 @@ namespace compilerLogic {
       case EInstruction::STORE: return EInstruction::STOREI;
       case EInstruction::LOAD: return EInstruction::LOADI;
       default:
-        throw std::domain_error("Critical error in Assignment class");
+        throw std::domain_error("Critical error in pickRefFun class");
       }
+      return EInstruction::HALT;
     };
 
     return {addISuffix(type, var), EParameterType::VAR_ID, var->getId()};

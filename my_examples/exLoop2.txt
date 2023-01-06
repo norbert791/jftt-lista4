@@ -2,15 +2,15 @@ PROGRAM IS
 VAR n,p
 BEGIN
   READ n;
-  REPEAT
+  WHILE n > 0
+  DO
     p := n;
-    
     REPEAT
       WRITE p;
       p := p - 1;
-    UNTIL p = 0;    
+    UNTIL p = 0;
     
     WRITE n;
     n := n - 1;
-  UNTIL n = 0;
+  ENDWHILE
 END

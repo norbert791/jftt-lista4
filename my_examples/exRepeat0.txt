@@ -1,0 +1,6 @@
+PROGRAM IS
+BEGIN
+  REPEAT
+    WRITE 0;
+  UNTIL 0 = 0;
+END

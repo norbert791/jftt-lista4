@@ -323,6 +323,7 @@ funParams: funParams "," identifier {addParameter($3.str);}
 
 void yyerror(const char msg[]) {
   fprintf(stderr,"error: %s in line %d\n", msg, yylineno - 1);
+  fflush(stdin);
   std::exit(EXIT_FAILURE);
 }
 

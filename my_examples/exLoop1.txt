@@ -5,10 +5,11 @@ BEGIN
   REPEAT
     p := n;
     
-    REPEAT
+    WHILE p > 0
+    DO
       WRITE p;
       p := p - 1;
-    UNTIL p = 0;    
+    ENDWHILE    
     
     WRITE n;
     n := n - 1;

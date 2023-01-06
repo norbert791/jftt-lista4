@@ -2,12 +2,11 @@ PROGRAM IS
 VAR n
 BEGIN
   READ n;
-  WHILE n > 0
-  DO
+  REPEAT
     IF n < 5 THEN
       WRITE n;
     ENDIF
     WRITE n;
     n := n - 1;
-  ENDWHILE
+  UNTIL n = 0;
 END
