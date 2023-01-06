@@ -208,10 +208,10 @@ program_all: procedures main
 procedures: procedures PROCEDURE {addProcedure();} proc_def {}
 | {}
 
-proc_def: proc_head IS VAR funParams MY_BEGIN commands END {scope.pop();}
+proc_def: proc_head IS VAR declarations MY_BEGIN commands END {scope.pop();}
 | proc_head IS MY_BEGIN commands END {scope.pop();}
 
-main: PROGRAM IS {addMain();} VAR declarations MY_BEGIN commands END
+main: PROGRAM IS {addMain();} VAR declarations MY_BEGIN commands END {scope.pop();}
 | PROGRAM IS {addMain();} MY_BEGIN commands END {scope.pop();}
 
  commands: commands command

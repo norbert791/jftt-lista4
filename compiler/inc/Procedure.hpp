@@ -1,6 +1,7 @@
 #ifndef PROCEDURE_HPP
 #define PROCEDURE_HPP
 
+#include <iostream>
 #include "Identifier.hpp"
 #include "IntermidiateCode.hpp"
 #include "Block.hpp"

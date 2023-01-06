@@ -13,9 +13,12 @@ namespace compilerLogic {
 
   std::shared_ptr<ProcedureCall> Procedure::getCall(
     std::vector<std::shared_ptr<Variable>> args) {
-    if (args.size() != this->parameters.size()) {
+    auto numOfArgs = args.size();
+    auto numOfParams = this->parameters.size();
+    if (numOfArgs != numOfParams) {
       throw std::logic_error("Incorrect number of arguments in call to: " + 
-        this->getName() + " procedure");
+        this->getName() + " procedure. Expected: " + std::to_string(numOfParams) + ". " + 
+        "Provided: " + std::to_string(numOfArgs) + ".");
     }
     auto result = std::make_shared<ProcedureCall>(
                                                   args,

@@ -99,6 +99,8 @@ namespace compilerLogic {
     static int64_t availableLabelId;
   };
 
+  IntermidiateCode pickRefVar(EParameterType type, std::shared_ptr<Variable> var);
+
   class ParsableToIntermidiate {
     public:
       virtual std::vector<IntermidiateCode> parseIntermidiate() = 0;
