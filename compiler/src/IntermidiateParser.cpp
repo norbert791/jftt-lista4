@@ -21,7 +21,8 @@ namespace compilerLogic {
     {
       for (auto instr : code) {
         if (
-            instr.parameterType == EParameterType::VAR_ID && 
+            (instr.parameterType == EParameterType::VAR_ID ||
+             instr.parameterType == EParameterType::REF_ID) && 
             this->addressMap.find(instr.value) == addressMap.end()
            ){
             addressMap.insert(std::make_pair(instr.value, this->mem_pool++));

@@ -6,7 +6,7 @@ set(CXX_STANDARD_REQUIRED TRUE)
 set(
     LOGIC_SOURCES src/Assignment.cpp src/GlobalBlock.cpp src/IntermidiateParser.cpp
     src/MainBlock.cpp src/IOCommand.cpp src/Block.cpp src/IfBlock.cpp src/IntermidiateCode.cpp
-    src/WhileBlock.cpp src/Procedure.cpp src/Multiplication.cpp
+    src/WhileBlock.cpp src/Procedure.cpp src/Multiplication.cpp src/DivMod.cpp
   )
 
 find_package(FLEX REQUIRED)

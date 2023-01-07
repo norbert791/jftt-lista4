@@ -1,0 +1,22 @@
+PROCEDURE div_two(a) IS
+VAR b
+BEGIN
+  b := 2;
+  a := a % b;
+END
+
+PROCEDURE div_four(a) IS
+VAR b
+BEGIN
+  a := a % 4;
+END
+
+PROGRAM IS
+VAR n
+BEGIN
+  READ n;
+  div_four(n);
+  WRITE n;
+  div_two(n);
+  WRITE n;
+END

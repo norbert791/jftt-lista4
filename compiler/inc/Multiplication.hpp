@@ -34,9 +34,9 @@ namespace compilerLogic {
        * c := a * b
       */
       std::shared_ptr<ProcedureCall> getCall(
-                                            std::shared_ptr<Variable> a,
-                                            std::shared_ptr<Variable> b,
-                                            std::shared_ptr<Variable> c
+                                              std::shared_ptr<Variable> a,
+                                              std::shared_ptr<Variable> b,
+                                              std::shared_ptr<Variable> c
                                             );
       inline virtual std::string getName() {return this->name;};
       inline virtual int64_t getId() {return this->id;};

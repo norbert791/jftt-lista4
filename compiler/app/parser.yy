@@ -22,6 +22,7 @@
 #include <WhileBlock.hpp>
 #include <Procedure.hpp>
 #include <Multiplication.hpp>
+#include <DivMod.hpp>
 
 #define YYERROR_VERBOSE 1
 
@@ -33,6 +34,7 @@ extern FILE* yyin;
 static compilerLogic::Expression exprVar;
 static std::shared_ptr<compilerLogic::GlobalBlock> globalBlock = nullptr;
 static std::shared_ptr<compilerLogic::Multiplication> mult = nullptr;
+static std::shared_ptr<compilerLogic::DivMod> divMod = nullptr;
 static std::stack<std::shared_ptr<compilerLogic::Block>> scope{};
 static std::array<std::string, 2> varStack = {"", ""};
 static std::vector<std::shared_ptr<compilerLogic::Variable>> procedureArgs{};
@@ -168,6 +170,32 @@ static inline void performMultiplication(
   temp->addCommand(mult->getCall(a, b, c));
 }
 
+static inline void performDivision(
+                                std::shared_ptr<compilerLogic::Variable> a,
+                                std::shared_ptr<compilerLogic::Variable> b,
+                                std::shared_ptr<compilerLogic::Variable> c
+                             ) {
+  if (divMod == nullptr) {
+    divMod = std::make_shared<compilerLogic::DivMod>(id);
+    globalBlock->addBlock(divMod);
+  }
+  auto temp = scope.top();
+  temp->addCommand(divMod->getDivCall(a, b, c));
+}
+
+static inline void performMod(
+                                std::shared_ptr<compilerLogic::Variable> a,
+                                std::shared_ptr<compilerLogic::Variable> b,
+                                std::shared_ptr<compilerLogic::Variable> c
+                             ) {
+  if (divMod == nullptr) {
+    divMod = std::make_shared<compilerLogic::DivMod>(id);
+    globalBlock->addBlock(divMod);
+  }
+  auto temp = scope.top();
+  temp->addCommand(divMod->getModCall(a, b, c));
+}
+
 %}
 
 %code requires{
@@ -241,6 +269,12 @@ main: PROGRAM IS {addMain();} VAR declarations MY_BEGIN commands END {scope.pop(
                                                       switch (exprVar.operation) {
                                                         case compilerLogic::EOperator::PROD:
                                                           performMultiplication(exprVar.left, exprVar.right, temp2Converted);
+                                                          break;
+                                                        case compilerLogic::EOperator::DIV:
+                                                          performDivision(exprVar.left, exprVar.right, temp2Converted);
+                                                          break;
+                                                        case compilerLogic::EOperator::MOD:
+                                                          performMod(exprVar.left, exprVar.right, temp2Converted);
                                                           break;
                                                         default:
                                                           scope.top()->addCommand(std::make_shared<compilerLogic::Assignment>(temp2Converted, exprVar));

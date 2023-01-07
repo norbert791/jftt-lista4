@@ -1,0 +1,16 @@
+PROCEDURE div(a,b,c) IS
+BEGIN
+  c := a / b;
+END
+
+PROGRAM IS
+VAR n,p,q
+BEGIN
+  READ n;
+  p := 1;
+  q := 10;
+  div(n, q, p);
+  WRITE p;
+  WRITE n;
+  WRITE q;
+END
