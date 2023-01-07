@@ -1,0 +1,17 @@
+PROCEDURE test(n) IS
+BEGIN
+  READ n;
+END
+
+PROCEDURE test_a(n) IS
+BEGIN
+  WRITE n;
+END
+
+PROGRAM IS
+VAR n
+BEGIN
+  n := 0;
+  test(n);
+  test_a(n);
+END
