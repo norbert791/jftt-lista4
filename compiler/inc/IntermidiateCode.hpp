@@ -46,6 +46,7 @@ namespace compilerLogic {
     LOADI,
     STOREI,
     HALT,
+    HALF,
     INSTR_COUNT, // Number of enum items, must be the last one
     LABEL // Label is not part of the assembler so it can be after INSTR_COUNT
   };
@@ -82,7 +83,8 @@ namespace compilerLogic {
       "SUBI",
       "LOADI",
       "STOREI",
-      "HALT"
+      "HALT",
+      "HALF"
     };
 
     const size_t index = static_cast<std::underlying_type_t<

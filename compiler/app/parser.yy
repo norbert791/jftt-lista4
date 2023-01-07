@@ -21,6 +21,7 @@
 #include <Condition.hpp>
 #include <WhileBlock.hpp>
 #include <Procedure.hpp>
+#include <Multiplication.hpp>
 
 #define YYERROR_VERBOSE 1
 
@@ -31,6 +32,7 @@ extern FILE* yyin;
 
 static compilerLogic::Expression exprVar;
 static std::shared_ptr<compilerLogic::GlobalBlock> globalBlock = nullptr;
+static std::shared_ptr<compilerLogic::Multiplication> mult = nullptr;
 static std::stack<std::shared_ptr<compilerLogic::Block>> scope{};
 static std::array<std::string, 2> varStack = {"", ""};
 static std::vector<std::shared_ptr<compilerLogic::Variable>> procedureArgs{};
@@ -153,6 +155,19 @@ static inline void setProcName(std::string name) {
   }
 }
 
+static inline void performMultiplication(
+                                          std::shared_ptr<compilerLogic::Variable> a,
+                                          std::shared_ptr<compilerLogic::Variable> b,
+                                          std::shared_ptr<compilerLogic::Variable> c
+                                        ) {
+  if (mult == nullptr) {
+    mult = std::make_shared<compilerLogic::Multiplication>(id);
+    globalBlock->addBlock(mult);
+  }
+  auto temp = scope.top();
+  temp->addCommand(mult->getCall(a, b, c));
+}
+
 %}
 
 %code requires{
@@ -223,8 +238,13 @@ main: PROGRAM IS {addMain();} VAR declarations MY_BEGIN commands END {scope.pop(
                                                       auto temp2 = scope.top()->findIdentifier(temp);
                                                       std::shared_ptr<compilerLogic::Variable> temp2Converted =
                                                         std::dynamic_pointer_cast<compilerLogic::Variable>(temp2);
-                                                      
-                                                      scope.top()->addCommand(std::make_shared<compilerLogic::Assignment>(temp2Converted, exprVar));
+                                                      switch (exprVar.operation) {
+                                                        case compilerLogic::EOperator::PROD:
+                                                          performMultiplication(exprVar.left, exprVar.right, temp2Converted);
+                                                          break;
+                                                        default:
+                                                          scope.top()->addCommand(std::make_shared<compilerLogic::Assignment>(temp2Converted, exprVar));
+                                                      }
                                                     } catch (const std::logic_error& e) {
                                                       std::cerr<<"Symbol " + $1.str + " is not a variable (line: " + std::to_string(yylineno) + " )\n";
                                                       exit(EXIT_FAILURE);

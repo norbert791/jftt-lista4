@@ -1,0 +1,22 @@
+PROCEDURE mult_two(a) IS
+VAR b
+BEGIN
+  b := 2;
+  a := a * b;
+END
+
+PROCEDURE mult_four(a) IS
+VAR b
+BEGIN
+  a := 4 * a;
+END
+
+PROGRAM IS
+VAR n
+BEGIN
+  READ n;
+  mult_two(n);
+  WRITE n;
+  mult_four(n);
+  WRITE n;
+END

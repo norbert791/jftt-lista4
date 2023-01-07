@@ -1,10 +1,10 @@
 -----Refactor------
 >Zrefaktoruj przydzielanie id dla zmiennych i etykiet (obecnie trzeba je nadawać ręcznie)
->Refactor: kod pośredni powinien używać pointerów do identifierów zamiast
-ich id.
+>Kod pośredni powinien używać pointerów do identifierów zamiast ich id.
+>Zamień standardowe wyjątki na wyjątki kompilatora
+>Zrefaktoruj expression buildera, aby nie używał stringów.
+>Przenieś akcję z operatorem przypisania do funkcji.
+>Rozważ scalenie Block::addCommand i Block::addBlock do Block::addParsable
 ----Funkcjonalność---------
 >Dodaj wykrywanie niezainicjalizowanych zmiennych
->Przetestuj poprawność parsowania maina bez deklaracji zmiennych
->Dodaj IO na parametrach procedur!
->Przetestuj czy poprawnie działa operacja A := B, gdzie A i B to referencja [done a.s]
->Dodaj więcej testów dla repeat until
+>Dodaj wykrywanie redeklaracji funkcji

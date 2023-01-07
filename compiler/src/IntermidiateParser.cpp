@@ -60,7 +60,9 @@ namespace compilerLogic {
         default:
           throw std::logic_error("Param type not implemented");
       }
-      newInstr += instr.instrName == EInstruction::HALT ? "" : " " + std::to_string(param);
+      newInstr += instr.instrName == EInstruction::HALT ||
+        instr.instrName == EInstruction::HALF ?
+        "" : " " + std::to_string(param);
       result.push_back(newInstr);
     }
 
