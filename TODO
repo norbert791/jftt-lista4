@@ -8,11 +8,14 @@
 >Część nagłówków definiuje więcej niż jedną klasę. Optymalnie byłoby je podzielić
   i projekt podzielić na większą liczbę ścieżek. Zmiany będzie wtedy wymagał także
   build system.
+>Rozwiń stos przy wyjątkach/błędach (wróc do maina)
+
 ----Funkcjonalność---------
 >Dodaj wykrywanie niezainicjalizowanych zmiennych
 >Dodaj wykrywanie redeklaracji funkcji
+
 ----Optymalizacje-----
 >Usuwanie martwego kodu (nieużywane zmienne, nieużywame funkcje, niepotrzebne operacje)
 >Refaktoryzacja kodu pętli (usunięcie niepotrzebnych skoków)
 >Refaktoryzacja kodu ifów (usunięcie niepotrzebnych skoków)
->Refaktoryzuj kod dzielenia (zmienna a_/leftCopy jest niepotrzebna)
+>Refaktoryzacja kodu dzielenia (zmienna a_/leftCopy jest niepotrzebna)

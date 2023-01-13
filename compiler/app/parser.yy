@@ -324,7 +324,8 @@ funParams: funParams "," identifier {addParameter($3.str);}
 
  declarations: declarations "," identifier {
                                             if (scope.top()->verifyIdentifier($3.str)) {
-                                              std::cerr<<("Variable redeclaration: " + $3.str)<<std::endl;
+                                              std::cerr<<("Variable redeclaration: " + $3.str + " in line: " + std::to_string(yylineno))<<std::endl;
+                                              std::exit(EXIT_FAILURE);
                                             } else {
                                               auto newVar = std::make_shared<compilerLogic::Variable>(id++, $3.str);
                                               scope.top()->addAvailableIdentifier(newVar);
@@ -332,7 +333,8 @@ funParams: funParams "," identifier {addParameter($3.str);}
                                           }
  | identifier {
                 if (scope.top()->verifyIdentifier($1.str)) {
-                  std::cerr<<("Variable redeclaration: " + $1.str)<<std::endl;
+                  std::cerr<<("Variable redeclaration: " + $1.str + "in line: " + std::to_string(yylineno))<<std::endl;
+                  std::exit(EXIT_FAILURE);
                 } else {
                   auto newVar = std::make_shared<compilerLogic::Variable>(id++, $1.str);
                   scope.top()->addAvailableIdentifier(newVar);
