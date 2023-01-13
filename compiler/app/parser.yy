@@ -59,7 +59,7 @@ static void expressionBuilderWrapper(std::string symbol, std::string var1, std::
     }
     exprVar = compilerLogic::expressionBuilder(symbol, left, right);
   } catch(const std::out_of_range& e) {
-    std::cerr<<e.what()<<std::endl;
+    std::cerr<<e.what()<<" in line: "<<std::to_string(yylineno)<<std::endl;
     exit(EXIT_FAILURE);
   } catch(const std::logic_error& e) {
     std::cerr<<"Symbol " + symbol + " is not a variable (line: " + std::to_string(yylineno) + " )"<<std::endl;
@@ -111,7 +111,7 @@ static void addCall(std::string funName) {
     procedureArgs.clear();
   } catch (std::logic_error& e) {
     std::cerr<<"Call error\n";
-    std::cerr<<e.what()<<std::endl;
+    std::cerr<<e.what()<<" in line: "<<std::to_string(yylineno)<<std::endl;
     exit(EXIT_FAILURE);
   }
 }
