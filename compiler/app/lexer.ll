@@ -11,6 +11,7 @@ int yylex();
 %}
 
 %option noyywrap yylineno
+%x IN_COMMENT
 
 %%
 [_a-z]+                   {
@@ -60,4 +61,7 @@ BEGIN                     {return MY_BEGIN;}
 >                         {return GE;}
 [<]                       {return LE;}
 [ \t\n]                   {}
+\[                        {BEGIN(IN_COMMENT);}
+<IN_COMMENT>\]            {BEGIN(INITIAL);}
+<IN_COMMENT>.             {}
 %%
