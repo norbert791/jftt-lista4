@@ -42,6 +42,7 @@ namespace compilerLogic {
     std::shared_ptr<Variable> result = nullptr;
     if (it == this->literals.end()) {
       result = std::make_shared<Variable>(id++, str);
+      result->initialize();
       this->literals.push_back(result);
     } else {
       result = *it;

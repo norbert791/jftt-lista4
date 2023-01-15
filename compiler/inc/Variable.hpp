@@ -19,11 +19,14 @@ namespace compilerLogic {
       inline virtual int64_t getId() override final {return id;};
       inline virtual EVariableType getType() {return varType;}
       inline virtual void setType(EVariableType varType) {this->varType = varType;}
+      inline virtual bool isInitialized() {return initialized;}
+      inline virtual void initialize() {this->initialized = true;}
     private:
       int64_t id;
       std::string name;
+      bool initialized = false;
       EVariableType varType = EVariableType::VALUE;
   };
 }
 
-#endif
+#endif //VARIABLE_HPP

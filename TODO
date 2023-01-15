@@ -8,11 +8,12 @@
 >Część nagłówków definiuje więcej niż jedną klasę. Optymalnie byłoby je podzielić
   i projekt podzielić na większą liczbę ścieżek. Zmiany będzie wtedy wymagał także
   build system.
->Rozwiń stos przy wyjątkach/błędach (wróc do maina)
+>Rozwiń stos przy wyjątkach/błędach (wróc do maina, pozbądź się exit)
 
 ----Funkcjonalność---------
 >Dodaj wykrywanie niezainicjalizowanych zmiennych
 >Dodaj wykrywanie redeklaracji funkcji
+>Nazwy parametrów mogą być takie same jak nazwy funkcji. Obecnie jest to niedozwolone.
 
 ----Optymalizacje-----
 >Usuwanie martwego kodu (nieużywane zmienne, nieużywame funkcje, niepotrzebne operacje)

@@ -54,8 +54,16 @@ static void expressionBuilderWrapper(std::string symbol, std::string var1, std::
   try {
     std::shared_ptr<compilerLogic::Variable> left = nullptr, right = nullptr;
     left = getValue(var1);
-    if (symbol != "none"){
+    if (!left->isInitialized()) {
+      std::cerr<<var1<<" is not initialized in line: "<<std::to_string(yylineno)<<std::endl;
+      exit(EXIT_FAILURE);
+    }
+    if (symbol != "none") {
       right = getValue(var2);
+      if (!right->isInitialized()) {
+        std::cerr<<var2<<" is not initialized in line: "<<std::to_string(yylineno)<<std::endl;
+        exit(EXIT_FAILURE);
+      }
     }
     exprVar = compilerLogic::expressionBuilder(symbol, left, right);
   } catch(const std::out_of_range& e) {
@@ -99,6 +107,7 @@ static void addWhile(compilerLogic::EWhileType type) {
 static void addCallArg(std::string varName) {
   auto variable = scope.top()->findIdentifier(varName);
   auto castedVar = std::dynamic_pointer_cast<compilerLogic::Variable>(variable);
+  castedVar->initialize();
   procedureArgs.push_back(castedVar);
 }
 
@@ -131,6 +140,12 @@ static inline void addParameter(std::string parameterName) {
       parameterName,
       compilerLogic::EVariableType::REFERENCE
     );
+    paramRef->initialize();
+    if (castedFun->verifyIdentifier(paramRef->getName())) {
+      throw std::logic_error("Redeclaration of function param in line: " +
+            std::to_string(yylineno)
+          );
+    }
     castedFun->addParameter(paramRef);
   } catch(std::logic_error& e) {
     std::cerr<<e.what()<<std::endl;
@@ -266,6 +281,7 @@ main: PROGRAM IS {addMain();} VAR declarations MY_BEGIN commands END {scope.pop(
                                                       auto temp2 = scope.top()->findIdentifier(temp);
                                                       std::shared_ptr<compilerLogic::Variable> temp2Converted =
                                                         std::dynamic_pointer_cast<compilerLogic::Variable>(temp2);
+                                                      temp2Converted->initialize();
                                                       switch (exprVar.operation) {
                                                         case compilerLogic::EOperator::PROD:
                                                           performMultiplication(exprVar.left, exprVar.right, temp2Converted);
@@ -291,6 +307,7 @@ main: PROGRAM IS {addMain();} VAR declarations MY_BEGIN commands END {scope.pop(
  | READ identifier ";"                            {
                                                     try {
                                                       auto temp = getValue($2.str);
+                                                      temp->initialize();
                                                       scope.top()->addCommand(
                                                         std::make_shared<compilerLogic::IOCommand>(
                                                         compilerLogic::EIOType::INPUT, temp));
@@ -303,6 +320,11 @@ main: PROGRAM IS {addMain();} VAR declarations MY_BEGIN commands END {scope.pop(
                                                     try {
                                                       auto temp = getValue(varStack.at(0));
                                                       varStackIndex = 0;
+                                                      if (!temp->isInitialized()) {
+                                                        std::cerr<<temp->getName()<<" is not initialized"
+                                                          <<" in line: "<<std::to_string(yylineno)<<std::endl;
+                                                        exit(EXIT_FAILURE);
+                                                      }
                                                       scope.top()->addCommand(
                                                         std::make_shared<compilerLogic::IOCommand>(
                                                         compilerLogic::EIOType::OUTPUT, temp));
@@ -333,7 +355,7 @@ funParams: funParams "," identifier {addParameter($3.str);}
                                           }
  | identifier {
                 if (scope.top()->verifyIdentifier($1.str)) {
-                  std::cerr<<("Variable redeclaration: " + $1.str + "in line: " + std::to_string(yylineno))<<std::endl;
+                  std::cerr<<("Variable redeclaration: " + $1.str + " in line: " + std::to_string(yylineno))<<std::endl;
                   std::exit(EXIT_FAILURE);
                 } else {
                   auto newVar = std::make_shared<compilerLogic::Variable>(id++, $1.str);

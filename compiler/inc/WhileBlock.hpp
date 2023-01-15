@@ -28,4 +28,4 @@ namespace compilerLogic {
 
 
 
-#endif
+#endif //WHILE_BLOCK_HPP
