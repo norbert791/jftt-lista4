@@ -116,7 +116,6 @@ namespace compilerLogic {
 
     result.insert(result.begin(), entryLabel);
     if (this->type == EWhileType::UNTIL) {
-      std::cout<<"dupa\n";
       result.insert(result.begin(), {{EInstruction::JUMP, EParameterType::LABEL_ID, trueJumpLabel.value}});
     }
     //Generate if true code

@@ -67,10 +67,12 @@ namespace compilerLogic {
       result.push_back(newInstr);
     }
 
+    /*
     std::cout<<"Memory map:\n";
     for (auto p : this->addressMap) {
       std::cout<<p.first<<" -> "<<p.second<<"\n";
     }
+    */
 
     return result;
   }

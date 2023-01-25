@@ -418,9 +418,9 @@ int main(int argc, char* argv[]) {
   yyparse();
   std::vector<compilerLogic::IntermidiateCode> result =
                              globalBlock->parseIntermidiate();
-  std::cout<<("Inter length: " + std::to_string(result.size()))<<std::endl;
+  //std::cout<<("Inter length: " + std::to_string(result.size()))<<std::endl;
   compilerLogic::IntermidiateParser interParser{};
-  interParser.showIntermidiateCode(result);
+  //interParser.showIntermidiateCode(result);
   auto parsed = interParser.parseIntermidiateCode(result);
   std::ofstream outputFile{argv[2]};
   if (!outputFile.good()) {
