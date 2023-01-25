@@ -11,7 +11,6 @@
 >Rozwiń stos przy wyjątkach/błędach (wróc do maina, pozbądź się exit)
 
 ----Funkcjonalność---------
->Dodaj wykrywanie niezainicjalizowanych zmiennych
 >Dodaj wykrywanie redeklaracji funkcji
 >Nazwy parametrów mogą być takie same jak nazwy funkcji. Obecnie jest to niedozwolone.
 

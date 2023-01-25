@@ -1,0 +1,21 @@
+PROCEDURE foo(a, b) IS
+BEGIN
+  a := a + 10;
+  b := b + 5;
+END
+
+PROCEDURE foo(a, b) IS
+BEGIN
+  a := a + 10;
+  b := b + 5;
+END
+
+PROGRAM IS
+VAR n,p
+BEGIN
+  READ n;
+  READ p;
+  foo(n,p);
+  WRITE n;
+  WRITE p;
+END
