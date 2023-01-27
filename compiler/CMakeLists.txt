@@ -26,5 +26,5 @@ add_executable(${PROJECT_NAME}
   ${FLEX_MyScanner_OUTPUTS}
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE src inc)
+#target_include_directories(${PROJECT_NAME} PRIVATE src inc)
 target_link_libraries(${PROJECT_NAME} ${FLEX_LIBRARIES} compilerLogic)
