@@ -17,4 +17,4 @@ Kompilator C: GNU 11.3.0
 Kompilator CXX: GNU 11.3.0
 FLEX: "2.6.4"
 BISON: "3.8.2"
-Do wybudowania CMake uży GNU Make
+Do wybudowania CMake użył GNU Make
